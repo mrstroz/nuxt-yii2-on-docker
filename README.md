@@ -1,7 +1,7 @@
-#NUXT + YII2 application on DOCKER
+# NUXT + YII2 application on DOCKER
 Simple application build with NUXT as frontend and YII2 as backed on Docker.
 
-##Installation
+## Installation
 ### NUXT
 1. Execute `npm install` command in `nuxt` folder.
 
