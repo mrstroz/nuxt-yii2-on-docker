@@ -1,0 +1,76 @@
+version: '3.7'
+services:
+  nuxt:
+    image: node:16
+    command: npm run dev
+    container_name: 'nuxt'
+    volumes:
+      - ./nuxt:/usr/src/app
+    working_dir: /usr/src/app
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: 0.0.0.0
+    networks:
+        - backed_network
+
+  yii:
+    image: yiisoftware/yii2-php:8.0-apache
+    container_name: 'yii'
+    volumes:
+      - ./docker/volumes/php/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./yii:/app:delegated
+    ports:
+      - '8000:80'
+    depends_on:
+      - mariadb
+    networks:
+      - backed_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - ./docker/volumes/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./docker/volumes/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - backed_network
+
+  mariadb:
+    image: "mariadb:${MARIADB_VERSION}"
+    container_name: 'mariadb'
+    restart: 'always'
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: "${MARIADB_ROOT_PASSWORD}"
+      MARIADB_DATABASE: "${MARIADB_DATABASE}"
+      MARIADB_USER: "${MARIADB_USER}"
+      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+    networks:
+      - backed_network
+
+  phpmyadmin:
+    image: phpmyadmin:5.0
+    container_name: 'phpmyadmin'
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=mariadb
+    depends_on:
+      - mariadb
+    networks:
+      - backed_network
+
+networks:
+  backed_network:
+    driver: bridge
+
+volumes:
+  mariadb:
+    driver: local
