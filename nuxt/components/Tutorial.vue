@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     send() {
-      this.$axios.$get('/crawler')
+      this.$axios.$get('crawlers')
     }
   }
 }

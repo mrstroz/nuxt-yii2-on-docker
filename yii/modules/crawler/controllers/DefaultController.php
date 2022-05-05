@@ -2,11 +2,16 @@
 
 namespace app\modules\crawler\controllers;
 
-use yii\rest\Controller;
+use app\modules\crawler\models\Crawler;
+use Yii;
+use yii\filters\ContentNegotiator;
+use yii\filters\Cors;
+use yii\rest\ActiveController;
 use yii\web\Response;
 
-class DefaultController extends Controller
+class DefaultController extends ActiveController
 {
+    public $modelClass = Crawler::class;
 
     public function behaviors()
     {
@@ -14,23 +19,23 @@ class DefaultController extends Controller
 
             // For cross-domain AJAX request
             'corsFilter' => [
-                'class' => \yii\filters\Cors::className(),
+                'class' => Cors::className(),
                 'cors' => [
                     // restrict access to domains:
-                    'Origin' => ['localhost:3000'],
+                    'Origin' => ['http://localhost:3000'],
                     'Access-Control-Request-Method' => ['GET', 'POST'],
                     'Access-Control-Allow-Credentials' => true,
                     'Access-Control-Max-Age' => 3600,                 // Cache (seconds)
                 ],
             ],
-
+            'contentNegotiator' => [
+                'class' => ContentNegotiator::className(),
+                'formats' => [
+                    'application/json' => Response::FORMAT_JSON,
+                ],
+            ],
         ]);
     }
 
-    public function actionIndex()
-    {
-        return [
-            'RESPONSE FROM YII2'
-        ];
-    }
+
 }
